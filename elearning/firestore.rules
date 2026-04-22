@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isLoggedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return isLoggedIn() && request.auth.uid == uid;
+    }
+
+    // Users collection
+    match /users/{uid} {
+      allow read: if isLoggedIn() && (isOwner(uid) || isAdmin());
+      allow create: if isAdmin();
+      allow update: if isAdmin() || isOwner(uid);
+      allow delete: if isAdmin();
+    }
+
+    // Courses - everyone logged in can read, only admin writes
+    match /courses/{courseId} {
+      allow read: if isLoggedIn();
+      allow write: if isAdmin();
+
+      // Lessons subcollection
+      match /lessons/{lessonId} {
+        allow read: if isLoggedIn();
+        allow write: if isAdmin();
+      }
+    }
+
+    // Progress - users can read/write their own, admin reads all
+    match /progress/{progressId} {
+      allow read: if isLoggedIn() && (
+        resource.data.uid == request.auth.uid || isAdmin()
+      );
+      allow create, update: if isLoggedIn() &&
+        request.resource.data.uid == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // Comments - logged in users can read/write, admin can delete
+    match /comments/{docId} {
+      allow read: if isLoggedIn();
+      allow write: if isLoggedIn();
+
+      match /items/{itemId} {
+        allow read: if isLoggedIn();
+        allow create: if isLoggedIn();
+        allow delete: if isLoggedIn() && (
+          resource.data.uid == request.auth.uid || isAdmin()
+        );
+      }
+    }
+  }
+}
