@@ -6,6 +6,11 @@
   <title>EduLearn — Nền Tảng Học Trực Tuyến</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23F0B90B'/><text y='22' x='6' font-size='18' font-weight='700' fill='%231E2026'>E</text></svg>">
 <style>
+/* =========================================================
+   MODULE CSS 01: BIẾN MÀU, KHOẢNG CÁCH, RADIUS, SHADOW
+   Ghi chú: Chỉnh theme tổng thể tại đây trước khi sửa từng class.
+   ========================================================= */
+
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 :root {
   --yellow: #F0B90B; --gold: #FFD000; --light-gold: #F8D12F; --active-yellow: #D0980B; --focus-blue: #1EAEDB;
@@ -19,12 +24,18 @@
   --radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:24px;--radius-pill:50px;
   --container:1200px;--nav-height:64px;
 }
+/* =========================================================
+   MODULE CSS 02: RESET CƠ BẢN & THIẾT LẬP NỀN
+   ========================================================= */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'IBM Plex Sans',Arial,sans-serif;font-size:16px;font-weight:500;line-height:1.5;color:var(--text-primary);background:var(--white);-webkit-font-smoothing:antialiased;}
 a{text-decoration:none;color:inherit;}img{max-width:100%;display:block;}button{cursor:pointer;font-family:inherit;border:none;background:none;}input,textarea{font-family:inherit;}ul,ol{list-style:none;}
 .container{max-width:var(--container);margin:0 auto;padding:0 var(--space-7);}
 @media(max-width:768px){.container{padding:0 var(--space-4);}}
+/* =========================================================
+   MODULE CSS 03: COMPONENT DÙNG CHUNG (BUTTON / CARD / INPUT / BADGE / TOAST / MODAL)
+   ========================================================= */
 .btn{display:inline-flex;align-items:center;gap:var(--space-2);font-size:16px;font-weight:600;letter-spacing:.16px;transition:background 200ms ease,color 200ms ease;white-space:nowrap;}
 .btn-primary{background:var(--yellow);color:var(--ink);border-radius:var(--radius-sm);padding:6px 32px;height:48px;}
 .btn-primary:hover{background:var(--focus-blue);color:var(--white);}
@@ -80,6 +91,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 .page{display:none;min-height:100vh;}
 .page.active{display:block;}
 #page-lesson.active{display:flex;flex-direction:column;}
+/* =========================================================
+   MODULE CSS 04: NAVBAR
+   ========================================================= */
 .navbar{position:sticky;top:0;z-index:100;height:var(--nav-height);background:var(--white);border-bottom:1px solid var(--border);box-shadow:rgba(32,32,37,.04) 0 2px 8px;}
 .nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-6);}
 .nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -98,6 +112,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 .dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--text-primary);transition:background 200ms ease;}
 .dropdown-item:hover{background:var(--snow);}
 .dropdown-divider{height:1px;background:var(--border);margin:4px 0;}
+/* =========================================================
+   MODULE CSS 05: TRANG ĐĂNG NHẬP
+   ========================================================= */
 .auth-wrapper{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
 .auth-left{background:var(--dark);padding:var(--space-10) var(--space-8);display:flex;flex-direction:column;justify-content:center;}
 .auth-brand{margin-bottom:var(--space-10);}
@@ -112,6 +129,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 .input-wrap .input{padding-right:44px;}
 .input-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--slate);display:flex;align-items:center;}
 .input-eye:hover{color:var(--text-primary);}
+/* =========================================================
+   MODULE CSS 06: DASHBOARD & DANH SÁCH KHÓA HỌC
+   ========================================================= */
 .dash-hero{background:var(--dark);padding:var(--space-8) 0;}
 .dash-hero-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-7);flex-wrap:wrap;}
 .dash-stats{display:flex;gap:var(--space-4);flex-shrink:0;}
@@ -125,6 +145,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 .course-thumb img{width:100%;height:100%;object-fit:cover;transition:transform 300ms ease;}
 .course-card:hover .course-thumb img{transform:scale(1.03);}
 .course-body{padding:var(--space-5);}
+/* =========================================================
+   MODULE CSS 07: TRANG KHÓA HỌC & CHI TIẾT BÀI HỌC
+   ========================================================= */
 .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:var(--space-6);}
 .breadcrumb-link{font-size:14px;font-weight:600;color:var(--yellow);}
 .breadcrumb-link:hover{text-decoration:underline;}
@@ -160,9 +183,15 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 .comment-input-area{display:flex;gap:var(--space-4);align-items:flex-start;margin-bottom:var(--space-6);}
 .comment-item{display:flex;gap:var(--space-4);padding:var(--space-5) 0;border-bottom:1px solid var(--border);}
 .comment-item:last-child{border-bottom:none;}
+/* =========================================================
+   MODULE CSS 08: HỒ SƠ NGƯỜI DÙNG
+   ========================================================= */
 .profile-card{overflow:hidden;}
 .profile-banner{height:120px;background:linear-gradient(135deg,var(--dark) 0%,#2B2F36 60%,rgba(240,185,11,.3) 100%);}
 .profile-info{padding:0 var(--space-7) var(--space-7);}
+/* =========================================================
+   MODULE CSS 09: TRANG QUẢN TRỊ
+   ========================================================= */
 .admin-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - var(--nav-height));}
 .admin-sidebar{background:var(--dark);display:flex;flex-direction:column;position:sticky;top:var(--nav-height);height:calc(100vh - var(--nav-height));overflow-y:auto;}
 .admin-sidebar-header{display:flex;align-items:center;gap:12px;padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.06);}
@@ -194,6 +223,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 0;gap:12px;}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--yellow);border-radius:50%;animation:spin 700ms linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* =========================================================
+   MODULE CSS 10: RESPONSIVE
+   ========================================================= */
 @media(max-width:1024px){.courses-grid{grid-template-columns:repeat(2,1fr);}.course-layout{grid-template-columns:1fr;}.course-sidebar{display:none;}}
 @media(max-width:768px){
   .auth-wrapper{grid-template-columns:1fr;}.auth-left{display:none;}.auth-right{padding:var(--space-6) var(--space-4);min-height:100vh;}
@@ -241,6 +273,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 </nav>
 <div id="toast-container"></div>
 
+<!-- =========================================================
+     MODULE HTML 01: TRANG ĐĂNG NHẬP
+     ========================================================= -->
 <!-- PAGE: AUTH -->
 <div class="page active" id="page-auth">
   <div class="auth-wrapper">
@@ -266,12 +301,18 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
   </div>
 </div>
 
+<!-- =========================================================
+     MODULE HTML 02: DASHBOARD
+     ========================================================= -->
 <!-- PAGE: DASHBOARD -->
 <div class="page" id="page-dashboard">
   <section class="dash-hero"><div class="container"><div class="dash-hero-inner"><div><p class="caption text-yellow" style="font-weight:600;margin-bottom:8px;">BẢNG ĐIỀU KHIỂN</p><h1 class="display-secondary text-white" id="dashboard-greeting">Xin chào 👋</h1><p class="body-lg text-slate" style="margin-top:12px;">Tiếp tục hành trình học tập của bạn hôm nay</p></div><div class="dash-stats"><div class="stat-card"><p class="stat-number" id="stat-lessons">0</p><p class="stat-label">Bài đã xong</p></div><div class="stat-card"><p class="stat-number" id="stat-courses">0</p><p class="stat-label">Khóa học</p></div><div class="stat-card"><p class="stat-number text-yellow" id="stat-pct">0%</p><p class="stat-label">Hoàn thành</p></div></div></div></div></section>
   <section class="section-light" style="padding-top:40px;"><div class="container"><h2 class="heading-2" style="margin-bottom:24px;">Khóa học của tôi</h2><div class="courses-grid" id="courses-grid"><div class="loading-state"><div class="spinner"></div><p class="caption text-slate">Đang tải...</p></div></div></div></section>
 </div>
 
+<!-- =========================================================
+     MODULE HTML 03: CHI TIẾT KHÓA HỌC
+     ========================================================= -->
 <!-- PAGE: COURSE -->
 <div class="page" id="page-course">
   <div class="container" style="padding-top:32px;padding-bottom:48px;">
@@ -295,6 +336,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
   </div>
 </div>
 
+<!-- =========================================================
+     MODULE HTML 04: CHI TIẾT BÀI HỌC
+     ========================================================= -->
 <!-- PAGE: LESSON -->
 <div class="page" id="page-lesson">
   <div class="lesson-layout">
@@ -321,6 +365,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
   </div>
 </div>
 
+<!-- =========================================================
+     MODULE HTML 05: HỒ SƠ NGƯỜI DÙNG
+     ========================================================= -->
 <!-- PAGE: PROFILE -->
 <div class="page" id="page-profile">
   <div class="container" style="padding-top:40px;padding-bottom:64px;max-width:720px;">
@@ -332,6 +379,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
   </div>
 </div>
 
+<!-- =========================================================
+     MODULE HTML 06: QUẢN TRỊ HỆ THỐNG
+     ========================================================= -->
 <!-- PAGE: ADMIN -->
 <div class="page" id="page-admin">
   <div class="admin-layout">
@@ -352,6 +402,9 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
   </div>
 </div>
 
+<!-- =========================================================
+     MODULE HTML 07: CÁC MODAL DÙNG CHUNG
+     ========================================================= -->
 <!-- MODALS -->
 <div class="modal-overlay" id="modal-student"><div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;"><h2 class="heading-3" id="modal-student-title">Thêm học viên</h2><button class="btn btn-ghost" onclick="closeModal('modal-student')" style="padding:4px;font-size:18px;">✕</button></div><form id="form-student"><input type="hidden" id="student-edit-uid"><div class="form-group"><label class="form-label">Họ và tên</label><input type="text" id="student-name" class="input" placeholder="Nguyễn Văn A" required></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="student-email" class="input" placeholder="hocvien@email.com" required></div><div class="form-group" id="student-pw-group"><label class="form-label">Mật khẩu</label><input type="text" id="student-password" class="input" placeholder="Tối thiểu 6 ký tự"></div><div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;"><button type="button" class="btn btn-outline btn-sm" onclick="closeModal('modal-student')">Hủy</button><button type="submit" class="btn btn-primary btn-sm" id="btn-student-submit">Tạo tài khoản</button></div></form></div></div>
 <div class="modal-overlay" id="modal-course"><div class="modal" style="max-width:560px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;"><h2 class="heading-3" id="modal-course-title">Thêm khóa học</h2><button class="btn btn-ghost" onclick="closeModal('modal-course')" style="padding:4px;font-size:18px;">✕</button></div><form id="form-course"><input type="hidden" id="course-edit-id"><div class="form-group"><label class="form-label">Tên khóa học</label><input type="text" id="course-name" class="input" required></div><div class="form-group"><label class="form-label">Mô tả</label><textarea id="course-desc" class="input" rows="3"></textarea></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label class="form-label">Giảng viên</label><input type="text" id="course-instructor-input" class="input"></div><div class="form-group"><label class="form-label">Cấp độ</label><select id="course-level" class="input"><option>Cơ bản</option><option>Trung cấp</option><option>Nâng cao</option></select></div></div><div class="form-group"><label class="form-label">Danh mục</label><input type="text" id="course-category" class="input"></div><div class="form-group"><label class="form-label">URL Ảnh thumbnail (tùy chọn)</label><input type="text" id="course-thumb" class="input" placeholder="https://..."></div><div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;"><button type="button" class="btn btn-outline btn-sm" onclick="closeModal('modal-course')">Hủy</button><button type="submit" class="btn btn-primary btn-sm" id="btn-course-submit">Tạo khóa học</button></div></form></div></div>
@@ -359,10 +412,19 @@ textarea.input{height:auto;padding:var(--space-3);resize:vertical;}
 <div class="modal-overlay" id="modal-confirm"><div class="modal" style="max-width:400px;"><div style="text-align:center;margin-bottom:24px;"><div style="width:56px;height:56px;border-radius:50%;background:rgba(246,70,93,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div><h2 class="heading-3" id="confirm-title">Xác nhận xóa</h2><p class="body text-slate" id="confirm-msg" style="margin-top:8px;"></p></div><div style="display:flex;gap:12px;justify-content:center;"><button class="btn btn-outline btn-sm" onclick="closeModal('modal-confirm')">Hủy</button><button class="btn btn-sm" id="confirm-ok-btn" style="background:var(--red);color:white;border-radius:var(--radius-sm);padding:6px 24px;font-weight:600;">Xóa</button></div></div></div>
 
 <script type="module">
+/* =========================================================
+   MODULE JS 01: IMPORT THƯ VIỆN FIREBASE
+   Ghi chú: Chỉ sửa khi cần nâng phiên bản SDK hoặc đổi dịch vụ.
+   ========================================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, query, orderBy, writeBatch, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+
+/* =========================================================
+   MODULE JS 02: CẤU HÌNH FIREBASE & KHỞI TẠO APP
+   Ghi chú: Toàn bộ khóa kết nối Firebase nằm ở đây.
+   ========================================================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCw6M0ancZPIdsF8ag9hAT-xslLnKrfatA",
   authDomain: "e-learning-trading.firebaseapp.com",
@@ -379,8 +441,18 @@ const secondaryApp = initializeApp(firebaseConfig, 'secondary');
 const secondaryAuth = getAuth(secondaryApp);
 const ADMIN_EMAIL = "admin@khangupdate.com";
 
+
+/* =========================================================
+   MODULE JS 03: STATE TOÀN CỤC
+   Ghi chú: Lưu trạng thái người dùng, khóa học hiện tại, bài học hiện tại...
+   ========================================================= */
 const state = { user: null, course: null, lesson: null, lessons: [], allCourses: [] };
 
+
+/* =========================================================
+   MODULE JS 04: HÀM TIỆN ÍCH DÙNG CHUNG
+   Ghi chú: Gom các hàm nhỏ như toast, chuyển trang, đóng mở modal, escape HTML...
+   ========================================================= */
 // ============ UTILS ============
 function showToast(msg, type='info') {
   let c = document.getElementById('toast-container');
@@ -399,6 +471,11 @@ document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click
 function escHtml(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function isAdmin(){return state.user&&(state.user.role==='admin'||state.user.email===ADMIN_EMAIL);}
 
+
+/* =========================================================
+   MODULE JS 05: TẦNG LÀM VIỆC VỚI FIREBASE / FIRESTORE
+   Ghi chú: Mọi thao tác đọc ghi dữ liệu nên sửa tại đây trước tiên.
+   ========================================================= */
 // ============ FIREBASE SERVICES ============
 async function getUserDoc(uid){const s=await getDoc(doc(db,'users',uid));return s.exists()?{uid,...s.data()}:null;}
 
@@ -448,6 +525,11 @@ async function updateLesson(courseId,lessonId,data){await updateDoc(doc(db,'cour
 async function deleteLesson(courseId,lessonId){await deleteDoc(doc(db,'courses',courseId,'lessons',lessonId));const lessons=await getLessons(courseId);await updateDoc(doc(db,'courses',courseId),{totalLessons:lessons.length});}
 async function reorderLessons(courseId,orderedIds){const batch=writeBatch(db);orderedIds.forEach((id,i)=>batch.update(doc(db,'courses',courseId,'lessons',id),{order:i}));await batch.commit();}
 
+
+/* =========================================================
+   MODULE JS 06: XÁC THỰC, ĐIỀU HƯỚNG SAU ĐĂNG NHẬP, NAVBAR
+   Ghi chú: Quản lý login/logout, onAuthStateChanged và các nút điều hướng chính.
+   ========================================================= */
 // ============ AUTH ============
 onAuthStateChanged(auth, async fbUser => {
   if(fbUser){
@@ -515,6 +597,11 @@ document.getElementById('login-form').addEventListener('submit',async e=>{
   }
 });
 
+
+/* =========================================================
+   MODULE JS 07: DASHBOARD HỌC VIÊN
+   Ghi chú: Tải danh sách khóa học, tính phần trăm tiến độ, render thẻ khóa học.
+   ========================================================= */
 // ============ DASHBOARD ============
 async function renderDashboard(){
   const grid=document.getElementById('courses-grid');
@@ -540,6 +627,11 @@ async function renderDashboard(){
   }catch(err){grid.innerHTML='<p class="caption text-red" style="text-align:center;padding:32px;">Lỗi tải dữ liệu.</p>';console.error(err);}
 }
 
+
+/* =========================================================
+   MODULE JS 08: TRANG KHÓA HỌC
+   Ghi chú: Hiển thị tổng quan khóa học và danh sách bài học.
+   ========================================================= */
 // ============ COURSE PAGE ============
 async function openCoursePage(courseId){
   showPage('course');
@@ -562,6 +654,11 @@ async function openCoursePage(courseId){
 document.getElementById('bc-dashboard').addEventListener('click',e=>{e.preventDefault();showPage('dashboard');renderDashboard();});
 document.getElementById('btn-start-course').addEventListener('click',()=>{if(state.lessons.length>0)openLessonPage(state.course.id,state.lessons[0].id);});
 
+
+/* =========================================================
+   MODULE JS 09: TRANG BÀI HỌC & VIDEO
+   Ghi chú: Render video YouTube, nội dung bài, nút hoàn thành bài học.
+   ========================================================= */
 // ============ LESSON PAGE ============
 async function openLessonPage(courseId,lessonId){
   showPage('lesson');
@@ -589,6 +686,11 @@ async function openLessonPage(courseId,lessonId){
 document.getElementById('btn-back-to-course').addEventListener('click',()=>{if(state.course)openCoursePage(state.course.id);else showPage('dashboard');});
 document.getElementById('btn-mark-done').addEventListener('click',async()=>{if(!state.lesson||!state.course)return;await markLessonDone(state.user.uid,state.course.id,state.lesson.id);showToast('🎉 Hoàn thành bài học!','success');await openLessonPage(state.course.id,state.lesson.id);});
 
+
+/* =========================================================
+   MODULE JS 10: BÌNH LUẬN
+   Ghi chú: Tải, thêm, xóa bình luận cho từng bài học.
+   ========================================================= */
 // ============ COMMENTS ============
 async function renderComments(courseId,lessonId){
   const comments=await getComments(courseId,lessonId);
@@ -611,6 +713,11 @@ document.getElementById('btn-submit-comment').addEventListener('click',async()=>
 });
 document.getElementById('comment-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))document.getElementById('btn-submit-comment').click();});
 
+
+/* =========================================================
+   MODULE JS 11: HỒ SƠ NGƯỜI DÙNG
+   Ghi chú: Hiển thị thông tin cá nhân và tóm tắt tiến độ học.
+   ========================================================= */
 // ============ PROFILE ============
 async function renderProfile(){
   document.getElementById('profile-name').textContent=state.user.name;
@@ -624,6 +731,11 @@ async function renderProfile(){
   el.querySelectorAll('[data-course-id]').forEach(card=>card.addEventListener('click',()=>openCoursePage(card.dataset.courseId)));
 }
 
+
+/* =========================================================
+   MODULE JS 12: TRANG QUẢN TRỊ
+   Ghi chú: Điều phối các tab quản trị học viên / khóa học / bài học / tiến độ.
+   ========================================================= */
 // ============ ADMIN ============
 let adminNavSetup = false;
 function initAdmin(){
@@ -654,6 +766,10 @@ async function loadAdminTab(tab){
   if(tab==='progress') await loadProgressTab();
 }
 
+
+/* ---------------------------------------------------------
+   SUBMODULE ADMIN 12.1: QUẢN LÝ HỌC VIÊN
+   --------------------------------------------------------- */
 // ---- STUDENTS ----
 async function loadStudents(){
   const wrap=document.getElementById('students-table-wrap');
@@ -705,6 +821,10 @@ document.getElementById('form-student').addEventListener('submit',async e=>{
   }finally{btn.disabled=false;btn.textContent=uid?'Lưu thay đổi':'Tạo tài khoản';}
 });
 
+
+/* ---------------------------------------------------------
+   SUBMODULE ADMIN 12.2: QUẢN LÝ KHÓA HỌC & BÀI HỌC
+   --------------------------------------------------------- */
 // ---- COURSES ----
 async function loadCourses(){
   const wrap=document.getElementById('admin-courses-list');
@@ -777,6 +897,10 @@ document.getElementById('form-lesson').addEventListener('submit',async e=>{
   finally{btn.disabled=false;btn.textContent=lessonId?'Lưu thay đổi':'Thêm bài học';}
 });
 
+
+/* ---------------------------------------------------------
+   SUBMODULE ADMIN 12.3: THEO DÕI TIẾN ĐỘ HỌC VIÊN
+   --------------------------------------------------------- */
 // ---- PROGRESS ----
 async function loadProgressTab(){
   const select=document.getElementById('progress-course-select');
@@ -794,6 +918,10 @@ async function loadProgressTab(){
   };
 }
 
+
+/* ---------------------------------------------------------
+   SUBMODULE ADMIN 12.4: MODAL XÁC NHẬN XÓA
+   --------------------------------------------------------- */
 // ---- CONFIRM DELETE ----
 function confirmDelete(title,msg,onConfirm){
   document.getElementById('confirm-title').textContent=title;
@@ -803,6 +931,11 @@ function confirmDelete(title,msg,onConfirm){
   newBtn.addEventListener('click',async()=>{closeModal('modal-confirm');await onConfirm();});
   openModal('modal-confirm');
 }
+
+/* =========================================================
+   KẾT THÚC FILE JS
+   Ghi chú: File này vẫn giữ nguyên cơ chế chạy 1 file index duy nhất.
+   ========================================================= */
 </script>
 </body>
 </html>
