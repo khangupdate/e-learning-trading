@@ -480,31 +480,35 @@ function isAdmin(){return state.user&&(state.user.role==='admin'||state.user.ema
 async function getUserDoc(uid){const s=await getDoc(doc(db,'users',uid));return s.exists()?{uid,...s.data()}:null;}
 
 async function getCourses(){
-  // FIX 1: Fallback nếu field 'order' chưa tồn tại trên một số docs → orderBy sẽ bỏ qua chúng
-  // Dùng getDocs không có orderBy rồi sort trên client để tránh mất dữ liệu
-  try {
-    const s = await getDocs(query(collection(db,'courses'), orderBy('order','asc')));
-    return s.docs.map(d=>({id:d.id,...d.data()}));
-  } catch(e) {
-    // Nếu thiếu composite index hoặc field 'order', fallback không sort
-    const s = await getDocs(collection(db,'courses'));
-    const docs = s.docs.map(d=>({id:d.id,...d.data()}));
-    return docs.sort((a,b)=>(a.order??999)-(b.order??999));
-  }
+  const s = await getDocs(collection(db,'courses'));
+  const docs = s.docs.map(d=>({id:d.id,...d.data()}));
+
+  return docs.sort((a,b)=>{
+    const ao = Number.isFinite(a.order) ? a.order : 999999;
+    const bo = Number.isFinite(b.order) ? b.order : 999999;
+    if (ao !== bo) return ao - bo;
+
+    const at = (a.createdAt?.seconds ?? 0);
+    const bt = (b.createdAt?.seconds ?? 0);
+    return at - bt;
+  });
 }
 
 async function getCourse(id){const s=await getDoc(doc(db,'courses',id));return s.exists()?{id:s.id,...s.data()}:null;}
 
 async function getLessons(courseId){
-  // FIX 1: Tương tự - fallback nếu orderBy('order') gặp lỗi do thiếu field/index
-  try {
-    const s = await getDocs(query(collection(db,'courses',courseId,'lessons'), orderBy('order','asc')));
-    return s.docs.map(d=>({id:d.id,...d.data()}));
-  } catch(e) {
-    const s = await getDocs(collection(db,'courses',courseId,'lessons'));
-    const docs = s.docs.map(d=>({id:d.id,...d.data()}));
-    return docs.sort((a,b)=>(a.order??999)-(b.order??999));
-  }
+  const s = await getDocs(collection(db,'courses',courseId,'lessons'));
+  const docs = s.docs.map(d=>({id:d.id,...d.data()}));
+
+  return docs.sort((a,b)=>{
+    const ao = Number.isFinite(a.order) ? a.order : 999999;
+    const bo = Number.isFinite(b.order) ? b.order : 999999;
+    if (ao !== bo) return ao - bo;
+
+    const at = (a.createdAt?.seconds ?? 0);
+    const bt = (b.createdAt?.seconds ?? 0);
+    return at - bt;
+  });
 }
 
 async function getProgress(uid,courseId){const s=await getDoc(doc(db,'progress',`${uid}_${courseId}`));return s.exists()?s.data().completedLessons||[]:[]; }
@@ -525,7 +529,19 @@ async function updateLesson(courseId,lessonId,data){await updateDoc(doc(db,'cour
 async function deleteLesson(courseId,lessonId){await deleteDoc(doc(db,'courses',courseId,'lessons',lessonId));const lessons=await getLessons(courseId);await updateDoc(doc(db,'courses',courseId),{totalLessons:lessons.length});}
 async function reorderLessons(courseId,orderedIds){const batch=writeBatch(db);orderedIds.forEach((id,i)=>batch.update(doc(db,'courses',courseId,'lessons',id),{order:i}));await batch.commit();}
 
+async function normalizeLessonOrder(courseId){
+  const lessons = await getLessons(courseId);
+  const batch = writeBatch(db);
 
+  lessons.forEach((lesson, index) => {
+    if (lesson.order !== index) {
+      batch.update(doc(db, 'courses', courseId, 'lessons', lesson.id), { order: index });
+    }
+  });
+
+  await batch.commit();
+}
+  
 /* =========================================================
    MODULE JS 06: XÁC THỰC, ĐIỀU HƯỚNG SAU ĐĂNG NHẬP, NAVBAR
    Ghi chú: Quản lý login/logout, onAuthStateChanged và các nút điều hướng chính.
@@ -635,8 +651,13 @@ async function renderDashboard(){
 // ============ COURSE PAGE ============
 async function openCoursePage(courseId){
   showPage('course');
-  const course=await getCourse(courseId); state.course=course;
-  const lessons=await getLessons(courseId); state.lessons=lessons;
+  const course = await getCourse(courseId);
+  state.course = course;
+
+  await normalizeLessonOrder(courseId);
+
+  const lessons = await getLessons(courseId);
+  state.lessons = lessons;
   const done=await getProgress(state.user.uid,courseId);
   const pct=lessons.length?Math.round(done.length/lessons.length*100):0;
   document.getElementById('bc-course-title').textContent=course.title;
@@ -665,6 +686,8 @@ async function openLessonPage(courseId,lessonId){
 
   // Luôn lấy lại dữ liệu mới nhất để tránh bị cache state.lessons cũ
   state.course = await getCourse(courseId);
+
+  await normalizeLessonOrder(courseId);
   state.lessons = await getLessons(courseId);
 
   // Nếu không còn bài học nào
