@@ -555,7 +555,7 @@ async function openCoursePage(courseId){
   document.getElementById('course-progress-pct').textContent=pct+'%';
   document.getElementById('course-progress-bar').style.width=pct+'%';
   const list=document.getElementById('lessons-list');
-  if(lessons.length===0){list.innerHTML='<p class="caption text-slate" style="padding:24px;text-align:center;">Chưa có bài học nào.</p>';return;}
+  if(lessons.length===0){list.innerHTML='<p class="caption text-slate" style="padding:24px;text-align:center;">Chưa có bài học nào.</p>';} else{ list.innerHTML=lessons.map((l,i)=>`<div class="lesson-item ${done.includes(l.id)?'done':''}" data-lesson-id="${l.id}"><div class="lesson-num">${done.includes(l.id)?'✓':i+1}</div><div class="lesson-info"><p class="body" style="font-weight:600;margin-bottom:2px;">${l.title}</p><p class="caption text-slate">${l.duration||''}</p></div><span class="lesson-arrow">›</span></div>`).join(''); list.querySelectorAll('.lesson-item').forEach(item=>item.addEventListener('click',()=>openLessonPage(courseId,item.dataset.lessonId))); }
   list.innerHTML=lessons.map((l,i)=>`<div class="lesson-item ${done.includes(l.id)?'done':''}" data-lesson-id="${l.id}"><div class="lesson-num">${done.includes(l.id)?'✓':i+1}</div><div class="lesson-info"><p class="body" style="font-weight:600;margin-bottom:2px;">${l.title}</p><p class="caption text-slate">${l.duration||''}</p></div><span class="lesson-arrow">›</span></div>`).join('');
   list.querySelectorAll('.lesson-item').forEach(item=>item.addEventListener('click',()=>openLessonPage(courseId,item.dataset.lessonId)));
 }
@@ -565,7 +565,7 @@ document.getElementById('btn-start-course').addEventListener('click',()=>{if(sta
 // ============ LESSON PAGE ============
 async function openLessonPage(courseId,lessonId){
   showPage('lesson');
-  if(!state.course||state.course.id!==courseId){state.course=await getCourse(courseId);state.lessons=await getLessons(courseId);}
+  state.course=await getCourse(courseId);state.lessons=await getLessons(courseId);
   const lesson=state.lessons.find(l=>l.id===lessonId); state.lesson=lesson;
   document.getElementById('lesson-video').src=lesson.youtubeId?`https://www.youtube.com/embed/${lesson.youtubeId}?rel=0&modestbranding=1`:'';
   document.getElementById('lesson-course-name').textContent=state.course.title;
