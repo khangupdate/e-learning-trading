@@ -374,6 +374,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Secondary app để tạo học viên mà không làm mất session admin
+const secondaryApp = initializeApp(firebaseConfig, 'secondary');
+const secondaryAuth = getAuth(secondaryApp);
 const ADMIN_EMAIL = "admin@khangupdate.com";
 
 const state = { user: null, course: null, lesson: null, lessons: [], allCourses: [] };
@@ -409,7 +413,7 @@ async function getComments(courseId,lessonId){const s=await getDocs(query(collec
 async function addCommentDB(courseId,lessonId,uid,name,text){await addDoc(collection(db,'comments',`${courseId}_${lessonId}`,'items'),{uid,author:name,text,createdAt:serverTimestamp()});}
 async function deleteCommentDB(courseId,lessonId,commentId){await deleteDoc(doc(db,'comments',`${courseId}_${lessonId}`,'items',commentId));}
 async function getAllStudents(){const s=await getDocs(query(collection(db,'users'),orderBy('createdAt','desc')));return s.docs.map(d=>({uid:d.id,...d.data()}));}
-async function createStudent(name,email,password){const cred=await createUserWithEmailAndPassword(auth,email,password);await setDoc(doc(db,'users',cred.user.uid),{name,email,role:'student',createdAt:serverTimestamp()});return cred.user.uid;}
+async function createStudent(name,email,password){const cred=await createUserWithEmailAndPassword(secondaryAuth,email,password);await setDoc(doc(db,"users",cred.user.uid),{name,email,role:"student",createdAt:serverTimestamp()});await signOut(secondaryAuth);return cred.user.uid;}
 async function deleteStudent(uid){await deleteDoc(doc(db,'users',uid));}
 async function createCourse(data){const courses=await getCourses();const ref=await addDoc(collection(db,'courses'),{...data,order:courses.length,createdAt:serverTimestamp()});return ref.id;}
 async function updateCourse(id,data){await updateDoc(doc(db,'courses',id),data);}
