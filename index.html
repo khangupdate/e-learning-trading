@@ -500,6 +500,24 @@ async function getLessons(courseId){
   const s = await getDocs(collection(db,'courses',courseId,'lessons'));
   const docs = s.docs.map(d=>({id:d.id,...d.data()}));
 
+  console.log('GET LESSONS RAW:', docs);
+
+  const sorted = docs.sort((a,b)=>{
+    const ao = Number.isFinite(a.order) ? a.order : 999999;
+    const bo = Number.isFinite(b.order) ? b.order : 999999;
+    if (ao !== bo) return ao - bo;
+
+    const at = (a.createdAt?.seconds ?? 0);
+    const bt = (b.createdAt?.seconds ?? 0);
+    return at - bt;
+  });
+
+  console.log('GET LESSONS SORTED:', sorted);
+  return sorted;
+}
+  const s = await getDocs(collection(db,'courses',courseId,'lessons'));
+  const docs = s.docs.map(d=>({id:d.id,...d.data()}));
+
   return docs.sort((a,b)=>{
     const ao = Number.isFinite(a.order) ? a.order : 999999;
     const bo = Number.isFinite(b.order) ? b.order : 999999;
@@ -689,6 +707,9 @@ async function openLessonPage(courseId,lessonId){
 
   await normalizeLessonOrder(courseId);
   state.lessons = await getLessons(courseId);
+  console.log('OPEN LESSON PAGE courseId:', courseId);
+console.log('OPEN LESSON PAGE lessonId:', lessonId);
+console.log('STATE LESSONS:', state.lessons);
 
   // Nếu không còn bài học nào
   if(!state.lessons || state.lessons.length === 0){
