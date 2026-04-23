@@ -606,6 +606,7 @@ async function loadAdminTab(tab){
 async function loadStudents(){
   const wrap=document.getElementById('students-table-wrap');
   wrap.innerHTML='<div class="loading-state"><div class="spinner"></div><p class="caption text-slate">Đang tải...</p></div>';
+  document.getElementById('btn-add-student').onclick=()=>openStudentModal();
   const students=await getAllStudents();
   const list=students.filter(s=>s.role!=='admin');
   if(list.length===0){wrap.innerHTML='<p class="caption text-slate" style="text-align:center;padding:32px;">Chưa có học viên nào.</p>';return;}
