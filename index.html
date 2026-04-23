@@ -662,26 +662,92 @@ document.getElementById('btn-start-course').addEventListener('click',()=>{if(sta
 // ============ LESSON PAGE ============
 async function openLessonPage(courseId,lessonId){
   showPage('lesson');
-  if(!state.course||state.course.id!==courseId){state.course=await getCourse(courseId);state.lessons=await getLessons(courseId);}
-  const lesson=state.lessons.find(l=>l.id===lessonId); state.lesson=lesson;
-  document.getElementById('lesson-video').src=lesson.youtubeId?`https://www.youtube.com/embed/${lesson.youtubeId}?rel=0&modestbranding=1`:'';
-  document.getElementById('lesson-course-name').textContent=state.course.title;
-  document.getElementById('lesson-title').textContent=lesson.title;
-  document.getElementById('lesson-description').textContent=lesson.description||'';
-  document.getElementById('comment-avatar').textContent=state.user.name.charAt(0).toUpperCase();
-  const done=await getProgress(state.user.uid,courseId);
-  const doneBtn=document.getElementById('btn-mark-done');
-  if(done.includes(lessonId)){doneBtn.textContent='✓ Đã hoàn thành';doneBtn.className='btn btn-ghost btn-sm';doneBtn.disabled=true;}
-  else{doneBtn.textContent='Đánh dấu hoàn thành';doneBtn.className='btn btn-primary btn-sm';doneBtn.disabled=false;}
-  const sidebar=document.getElementById('lesson-sidebar-list');
-  sidebar.innerHTML=state.lessons.map((l,i)=>`<div class="sidebar-lesson ${l.id===lessonId?'active':''} ${done.includes(l.id)?'done':''}" data-lesson-id="${l.id}"><div class="sidebar-num">${done.includes(l.id)?'✓':i+1}</div><div><p style="font-size:13px;font-weight:600;line-height:1.3;margin-bottom:2px;">${l.title}</p><p style="font-size:12px;color:var(--slate);">${l.duration||''}</p></div></div>`).join('');
-  sidebar.querySelectorAll('.sidebar-lesson').forEach(item=>item.addEventListener('click',()=>openLessonPage(courseId,item.dataset.lessonId)));
-  const idx=state.lessons.findIndex(l=>l.id===lessonId);
-  const pb=document.getElementById('btn-prev-lesson'),nb=document.getElementById('btn-next-lesson');
-  pb.style.display=idx>0?'':'none'; nb.style.display=idx<state.lessons.length-1?'':'none';
-  pb.onclick=()=>openLessonPage(courseId,state.lessons[idx-1].id);
-  nb.onclick=()=>openLessonPage(courseId,state.lessons[idx+1].id);
-  await renderComments(courseId,lessonId);
+
+  // Luôn lấy lại dữ liệu mới nhất để tránh bị cache state.lessons cũ
+  state.course = await getCourse(courseId);
+  state.lessons = await getLessons(courseId);
+
+  // Nếu không còn bài học nào
+  if(!state.lessons || state.lessons.length === 0){
+    document.getElementById('lesson-sidebar-list').innerHTML = '<p class="caption text-slate" style="padding:16px;">Chưa có bài học nào.</p>';
+    document.getElementById('lesson-video').src = '';
+    document.getElementById('lesson-course-name').textContent = state.course?.title || '';
+    document.getElementById('lesson-title').textContent = 'Chưa có bài học';
+    document.getElementById('lesson-description').textContent = '';
+    document.getElementById('btn-prev-lesson').style.display = 'none';
+    document.getElementById('btn-next-lesson').style.display = 'none';
+    document.getElementById('btn-mark-done').style.display = 'none';
+    return;
+  }
+
+  // Nếu lessonId không còn hợp lệ, tự fallback về bài đầu tiên
+  let lesson = state.lessons.find(l => l.id === lessonId);
+  if(!lesson){
+    lesson = state.lessons[0];
+    lessonId = lesson.id;
+  }
+
+  state.lesson = lesson;
+
+  document.getElementById('lesson-video').src =
+    lesson.youtubeId
+      ? `https://www.youtube.com/embed/${lesson.youtubeId}?rel=0&modestbranding=1`
+      : '';
+
+  document.getElementById('lesson-course-name').textContent = state.course.title;
+  document.getElementById('lesson-title').textContent = lesson.title;
+  document.getElementById('lesson-description').textContent = lesson.description || '';
+  document.getElementById('comment-avatar').textContent = state.user.name.charAt(0).toUpperCase();
+
+  const done = await getProgress(state.user.uid, courseId);
+  const doneBtn = document.getElementById('btn-mark-done');
+  doneBtn.style.display = '';
+
+  if(done.includes(lessonId)){
+    doneBtn.textContent = '✓ Đã hoàn thành';
+    doneBtn.className = 'btn btn-ghost btn-sm';
+    doneBtn.disabled = true;
+  }else{
+    doneBtn.textContent = 'Đánh dấu hoàn thành';
+    doneBtn.className = 'btn btn-primary btn-sm';
+    doneBtn.disabled = false;
+  }
+
+  const sidebar = document.getElementById('lesson-sidebar-list');
+  sidebar.innerHTML = state.lessons.map((l,i)=>`
+    <div class="sidebar-lesson ${l.id===lessonId?'active':''} ${done.includes(l.id)?'done':''}" data-lesson-id="${l.id}">
+      <div class="sidebar-num">${done.includes(l.id)?'✓':i+1}</div>
+      <div>
+        <p style="font-size:13px;font-weight:600;line-height:1.3;margin-bottom:2px;">${l.title}</p>
+        <p style="font-size:12px;color:var(--slate);">${l.duration||''}</p>
+      </div>
+    </div>
+  `).join('');
+
+  sidebar.querySelectorAll('.sidebar-lesson').forEach(item=>{
+    item.addEventListener('click',()=>openLessonPage(courseId,item.dataset.lessonId));
+  });
+
+  const idx = state.lessons.findIndex(l => l.id === lessonId);
+  const pb = document.getElementById('btn-prev-lesson');
+  const nb = document.getElementById('btn-next-lesson');
+
+  pb.style.display = idx > 0 ? '' : 'none';
+  nb.style.display = idx < state.lessons.length - 1 ? '' : 'none';
+
+  pb.onclick = ()=>{
+    if(idx > 0){
+      openLessonPage(courseId, state.lessons[idx - 1].id);
+    }
+  };
+
+  nb.onclick = ()=>{
+    if(idx < state.lessons.length - 1){
+      openLessonPage(courseId, state.lessons[idx + 1].id);
+    }
+  };
+
+  await renderComments(courseId, lessonId);
 }
 document.getElementById('btn-back-to-course').addEventListener('click',()=>{if(state.course)openCoursePage(state.course.id);else showPage('dashboard');});
 document.getElementById('btn-mark-done').addEventListener('click',async()=>{if(!state.lesson||!state.course)return;await markLessonDone(state.user.uid,state.course.id,state.lesson.id);showToast('🎉 Hoàn thành bài học!','success');await openLessonPage(state.course.id,state.lesson.id);});
