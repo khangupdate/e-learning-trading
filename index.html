@@ -515,19 +515,6 @@ async function getLessons(courseId){
   console.log('GET LESSONS SORTED:', sorted);
   return sorted;
 }
-  const s = await getDocs(collection(db,'courses',courseId,'lessons'));
-  const docs = s.docs.map(d=>({id:d.id,...d.data()}));
-
-  return docs.sort((a,b)=>{
-    const ao = Number.isFinite(a.order) ? a.order : 999999;
-    const bo = Number.isFinite(b.order) ? b.order : 999999;
-    if (ao !== bo) return ao - bo;
-
-    const at = (a.createdAt?.seconds ?? 0);
-    const bt = (b.createdAt?.seconds ?? 0);
-    return at - bt;
-  });
-}
 
 async function getProgress(uid,courseId){const s=await getDoc(doc(db,'progress',`${uid}_${courseId}`));return s.exists()?s.data().completedLessons||[]:[]; }
 async function markLessonDone(uid,courseId,lessonId){const ref=doc(db,'progress',`${uid}_${courseId}`);const s=await getDoc(ref);const cur=s.exists()?s.data().completedLessons||[]:[];if(!cur.includes(lessonId))await setDoc(ref,{uid,courseId,completedLessons:[...cur,lessonId],updatedAt:serverTimestamp()},{merge:true});}
