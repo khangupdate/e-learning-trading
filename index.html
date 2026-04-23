@@ -375,7 +375,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Secondary app để tạo học viên mà không làm mất session admin
 const secondaryApp = initializeApp(firebaseConfig, 'secondary');
 const secondaryAuth = getAuth(secondaryApp);
 const ADMIN_EMAIL = "admin@khangupdate.com";
@@ -402,9 +401,35 @@ function isAdmin(){return state.user&&(state.user.role==='admin'||state.user.ema
 
 // ============ FIREBASE SERVICES ============
 async function getUserDoc(uid){const s=await getDoc(doc(db,'users',uid));return s.exists()?{uid,...s.data()}:null;}
-async function getCourses(){const s=await getDocs(query(collection(db,'courses'),orderBy('order','asc')));return s.docs.map(d=>({id:d.id,...d.data()}));}
+
+async function getCourses(){
+  // FIX 1: Fallback nếu field 'order' chưa tồn tại trên một số docs → orderBy sẽ bỏ qua chúng
+  // Dùng getDocs không có orderBy rồi sort trên client để tránh mất dữ liệu
+  try {
+    const s = await getDocs(query(collection(db,'courses'), orderBy('order','asc')));
+    return s.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e) {
+    // Nếu thiếu composite index hoặc field 'order', fallback không sort
+    const s = await getDocs(collection(db,'courses'));
+    const docs = s.docs.map(d=>({id:d.id,...d.data()}));
+    return docs.sort((a,b)=>(a.order??999)-(b.order??999));
+  }
+}
+
 async function getCourse(id){const s=await getDoc(doc(db,'courses',id));return s.exists()?{id:s.id,...s.data()}:null;}
-async function getLessons(courseId){const s=await getDocs(query(collection(db,'courses',courseId,'lessons'),orderBy('order','asc')));return s.docs.map(d=>({id:d.id,...d.data()}));}
+
+async function getLessons(courseId){
+  // FIX 1: Tương tự - fallback nếu orderBy('order') gặp lỗi do thiếu field/index
+  try {
+    const s = await getDocs(query(collection(db,'courses',courseId,'lessons'), orderBy('order','asc')));
+    return s.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e) {
+    const s = await getDocs(collection(db,'courses',courseId,'lessons'));
+    const docs = s.docs.map(d=>({id:d.id,...d.data()}));
+    return docs.sort((a,b)=>(a.order??999)-(b.order??999));
+  }
+}
+
 async function getProgress(uid,courseId){const s=await getDoc(doc(db,'progress',`${uid}_${courseId}`));return s.exists()?s.data().completedLessons||[]:[]; }
 async function markLessonDone(uid,courseId,lessonId){const ref=doc(db,'progress',`${uid}_${courseId}`);const s=await getDoc(ref);const cur=s.exists()?s.data().completedLessons||[]:[];if(!cur.includes(lessonId))await setDoc(ref,{uid,courseId,completedLessons:[...cur,lessonId],updatedAt:serverTimestamp()},{merge:true});}
 async function getAllProgressForUser(uid){const s=await getDocs(query(collection(db,'progress'),where('uid','==',uid)));return s.docs.map(d=>d.data());}
@@ -435,9 +460,19 @@ onAuthStateChanged(auth, async fbUser => {
       else{showPage('dashboard');await renderDashboard();}
     }catch(err){console.error('Auth error:',err);await signOut(auth);}
   } else {
-    state.user=null;showPage('auth');
+    state.user=null;
+    showPage('auth');
     document.getElementById('nav-links').style.display='none';
     document.getElementById('nav-user').style.display='none';
+
+    // FIX 2: Reset nút đăng nhập khi quay lại trang auth (sau logout)
+    // Đảm bảo nút không bị kẹt ở trạng thái disabled/loading
+    const loginBtn = document.getElementById('login-btn');
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Đăng nhập';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
   }
 });
 
@@ -467,8 +502,17 @@ document.getElementById('login-form').addEventListener('submit',async e=>{
   const errEl=document.getElementById('login-error');
   const btn=document.getElementById('login-btn');
   btn.textContent='Đang đăng nhập...';btn.disabled=true;errEl.textContent='';
-  try{await signInWithEmailAndPassword(auth,email,password);}
-  catch(err){errEl.textContent='Email hoặc mật khẩu không đúng';btn.textContent='Đăng nhập';btn.disabled=false;}
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+    // FIX 2: Không cần reset btn ở đây vì onAuthStateChanged sẽ chuyển trang
+    // Nhưng nếu có lỗi thì onAuthStateChanged không fire → reset trong catch
+  }
+  catch(err){
+    errEl.textContent='Email hoặc mật khẩu không đúng';
+    // FIX 2: Reset nút khi đăng nhập thất bại
+    btn.textContent='Đăng nhập';
+    btn.disabled=false;
+  }
 });
 
 // ============ DASHBOARD ============
@@ -581,7 +625,6 @@ async function renderProfile(){
 }
 
 // ============ ADMIN ============
-// FIX: Dùng flag để tránh gắn event listener nhiều lần
 let adminNavSetup = false;
 function initAdmin(){
   if(!adminNavSetup){
@@ -600,8 +643,6 @@ function setupAdminNav(){
     });
   });
   document.getElementById('admin-back-btn').addEventListener('click',()=>{showPage('dashboard');renderDashboard();});
-
-  // FIX: Gắn event cho nút Thêm tại đây, một lần duy nhất
   document.getElementById('btn-add-student').addEventListener('click',()=>openStudentModal());
   document.getElementById('btn-add-course').addEventListener('click',()=>openCourseModal());
 }
